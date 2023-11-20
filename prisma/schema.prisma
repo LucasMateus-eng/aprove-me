@@ -19,6 +19,8 @@ model Assignor {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Payable   Payable[]
+
+  @@map("assignors")
 }
 
 model Payable {
@@ -29,4 +31,6 @@ model Payable {
   assignorId   String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@map("payables")
 }
