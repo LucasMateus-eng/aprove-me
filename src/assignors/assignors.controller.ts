@@ -18,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { AssignorEntity } from './entities/assignor.entity';
 
-@Controller('assignors')
+@Controller('/integrations/assignors')
 @ApiTags('assignors')
 export class AssignorsController {
   constructor(private readonly assignorsService: AssignorsService) {}
