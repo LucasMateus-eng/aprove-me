@@ -14,6 +14,7 @@ async function bootstrap() {
     .setTitle('Bankme')
     .setDescription('Bankme receivables API')
     .setVersion('0.1')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
