@@ -7,6 +7,7 @@ import { PayablesModule } from './payables/payables.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
+import { LoggerModule } from 'nestjs-pino';
 import base from './config/base.config';
 
 @Module({
@@ -17,6 +18,19 @@ import base from './config/base.config';
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true, load: [base] }),
     UsersModule,
+    LoggerModule.forRoot({
+      pinoHttp: {
+        customProps: (req, res) => ({
+          context: 'HTTP',
+        }),
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            singleLine: true,
+          },
+        },
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
