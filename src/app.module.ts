@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { LoggerModule } from 'nestjs-pino';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 import base from './config/base.config';
 
 @Module({
@@ -16,8 +18,14 @@ import base from './config/base.config';
     AssignorsModule,
     PayablesModule,
     AuthModule,
-    ConfigModule.forRoot({ isGlobal: true, load: [base] }),
     UsersModule,
+    ConfigModule.forRoot({ isGlobal: true, load: [base] }),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+    }),
     LoggerModule.forRoot({
       pinoHttp: {
         customProps: (req, res) => ({
