@@ -1,9 +1,12 @@
-import { Logger, Injectable } from '@nestjs/common';
+import { Logger, Injectable, Inject } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +16,7 @@ export class UsersService {
   constructor(
     private prisma: PrismaService,
     private readonly configService: ConfigService,
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
   ) {
     const roundsOfHashing = this.configService.get<number>('roundsOfHashing');
 
@@ -42,10 +46,24 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     this.logger.log(`Retrieve user with id ${id}`);
 
-    return this.prisma.user.findUnique({ where: { id } });
+    const cachedData = await this.cacheService.get<User>(id);
+
+    if (cachedData) {
+      this.logger.log(`Getting user from cache!`);
+
+      return cachedData;
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (user) {
+      await this.cacheService.set(id, user);
+    }
+
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
