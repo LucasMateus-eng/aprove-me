@@ -38,5 +38,5 @@ lerna-debug.log*
 *.env
 
 # prisma sqlite
-/prisma/*.db
-/prisma/*.db-journal
+/src/database/*.db
+/src/database/*.db-journal
